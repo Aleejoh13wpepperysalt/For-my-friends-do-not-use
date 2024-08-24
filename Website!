@@ -1,17 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Roblox</title>
-</head>
-<body>
-    <button onclick="openRoblox()">Open Roblox</button>
+import numpy as np
+import random
+import pickle
 
-    <script>
-        function openRoblox() {
-            window.open('https://www.roblox.com', '_blank');
-        }
-    </script>
-</body>
-</html>
+class SimpleAI:
+    def __init__(self, memory_file='memory.pkl'):
+        self.memory_file = memory_file
+        self.memory = self.load_memory()
+        self.actions = ['correct_action', 'mistake']
+    
+    def load_memory(self):
+        try:
+            with open(self.memory_file, 'rb') as f:
+                return pickle.load(f)
+        except FileNotFoundError:
+            return {'mistakes': 0}
+
+    def save_memory(self):
+        with open(self.memory_file, 'wb') as f:
+            pickle.dump(self.memory, f)
+
+    def choose_action(self):
+        # Choose an action based on a simple rule or randomly
+        if random.random() > 0.5:
+            return 'correct_action'
+        else:
+            return 'mistake'
+
+    def train(self):
+        action = self.choose_action()
+        print(f"AI chose: {action}")
+        
+        if action == 'mistake':
+            self.memory['mistakes'] += 1
+            print(f"Mistake made! Total mistakes: {self.memory['mistakes']}")
+            if self.memory['mistakes'] >= 3:
+                print("Too many mistakes! Resetting AI (simulated death).")
+                self.memory['mistakes'] = 0
+        else:
+            print("Action successful!")
+        
+        self.save_memory()
+
+# Usage
+ai = SimpleAI()
+
+for _ in range(10):  # Train the AI over 10 iterations
+    ai.train()
